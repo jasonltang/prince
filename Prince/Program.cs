@@ -1,10 +1,11 @@
-﻿// Eval function doesn't work properly, always picks first box
+﻿// Todo
+// Randomise the winning move.
+// Prioritise immediate wins.
+// Sorting of moves to make minimax more efficient.
+// Allow computer to play both sides.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Prince.Engine;
 using Prince.Games;
 
 namespace Prince
@@ -14,6 +15,7 @@ namespace Prince
         static void Main(string[] args)
         {
             var game = new TicTacToe();
+            var engine = new Minimax();
             while (true)
             {
                 var input = Console.ReadLine();
@@ -22,9 +24,11 @@ namespace Prince
                     Console.WriteLine("Invalid move");
                     continue;
                 }
-                var computerMove = Engine.Engine.AssessPosition(game.Clone()).BestMove;
+                if (game.Adjudicate()) continue;
+                var computerMove = engine.Calculate(game.Clone()).BestMove;
                 game.PlayMove(computerMove);
                 game.PrintBoard();
+                game.Adjudicate();
             }
         }
     }

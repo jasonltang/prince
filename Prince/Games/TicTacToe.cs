@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Prince.ExtensionMethods;
 
 
@@ -62,6 +60,15 @@ namespace Prince.Games
         public bool PlayMove(string input)
         {
             input = input.ToUpper();
+            var isValidSyntax =
+                input.Length == 3 &&
+                char.IsLetter(input[0]) &&
+                char.IsNumber(input[1]) &&
+                char.IsNumber(input[2]);
+            if (!isValidSyntax)
+            {
+                return false;
+            }
             var player = char.ToUpper(input[0]) == 'X' ? Player.X : Player.O;
             if (!GetPossibleMoves().Contains(input))
             {
@@ -103,6 +110,24 @@ namespace Prince.Games
             return possibleMoves;
         }
 
+        public int GetMoveValue(string move)
+        {
+            var row = int.Parse(move[1].ToString());
+            var col = int.Parse(move[2].ToString());
+            if (row == 1 && col == 1)
+            {
+                return 2;
+            }
+            else if (row % 2 == 0 && col % 2 == 0)
+            {
+                return 1;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
         public void PrintBoard()
         {
             Console.WriteLine(_state.Board.GetRow(0));
@@ -123,6 +148,29 @@ namespace Prince.Games
                 board[0, 0] == ch && board[1, 1] == ch && board[2, 2] == ch ||
                 board[2, 0] == ch && board[1, 1] == ch && board[0, 2] == ch)
             {
+                return true;
+            }
+            return false;
+        }
+
+        public bool Adjudicate()
+        {
+            if (CheckIfWinner(Player.X))
+            {
+                Console.WriteLine("X wins!");
+                Reset();
+                return true;
+            }
+            if (CheckIfWinner(Player.O))
+            {
+                Console.WriteLine("O wins!");
+                Reset();
+                return true;
+            }
+            if (BoardFull())
+            {
+                Console.WriteLine("It's a draw!");
+                Reset();
                 return true;
             }
             return false;

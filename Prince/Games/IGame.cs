@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Prince.Games
 {
-    interface IGame
+    public interface IGame
     {
         void Reset();
         bool PlayMove(string move);
@@ -14,5 +10,6 @@ namespace Prince.Games
         float? Evaluate();
         HashSet<string> GetPossibleMoves();
         IGame Clone();
+        int GetMoveValue(string move);
     }
 }
