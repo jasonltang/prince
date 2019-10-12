@@ -6,6 +6,7 @@ namespace Prince.Engine
     {
         public float Evaluation;
         public string BestMove;
+        public int? MovesToFinishGame;
     }
 
 

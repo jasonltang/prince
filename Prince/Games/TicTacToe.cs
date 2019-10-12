@@ -28,11 +28,30 @@ namespace Prince.Games
 
         private State _state;
 
-        private const char BLANK = '-';
+        private const char Blank = '-';
 
         public TicTacToe()
         {
             Reset();
+        }
+
+        /// <summary>
+        /// Valid input string: "--- OX- --- X". Game layout given in three rows, followed by player to move.
+        /// </summary>
+        public void SetState(string state)
+        {
+            var stateArray = state.Split(' ');
+            if (stateArray.Length != 4)
+                throw new ArgumentException("Input not a valid format!");
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    _state.Board[i, j] = stateArray[i][j];
+                }
+
+                _state.PlayerToMove = (Player) Enum.Parse(typeof(Player), stateArray[3]);
+            }
         }
 
         public IGame Clone() // Cloning may have a problem
@@ -46,19 +65,23 @@ namespace Prince.Games
 
         public void Reset()
         {
-            _state = new State();
-            _state.PlayerToMove = Player.X;
+            _state = new State {PlayerToMove = Player.X};
             for (int i = 0; i < 3; i++)
             {
                 for (int j = 0; j < 3; j++)
                 {
-                    _state.Board[i, j] = BLANK;
+                    _state.Board[i, j] = Blank;
                 }
             }
         }
 
+        /// <summary>
+        /// Input must be of the form 'X11' for the middle square, or 'X01' for the left square, etc.
+        /// </summary>
         public bool PlayMove(string input)
         {
+            if (string.IsNullOrEmpty(input))
+                throw new ArgumentException("Input move is empty!");
             input = input.ToUpper();
             var isValidSyntax =
                 input.Length == 3 &&
@@ -101,13 +124,18 @@ namespace Prince.Games
             {
                 for (int j = 0; j < 3; j++)
                 {
-                    if (_state.Board[i, j] == BLANK)
+                    if (_state.Board[i, j] == Blank)
                     {
-                        possibleMoves.Add(playerToMove.ToString() + i.ToString() + j.ToString());
+                        possibleMoves.Add(playerToMove.ToString() + i + j);
                     }
                 }
             }
             return possibleMoves;
+        }
+
+        public bool IsTerminalEvaluation(float evaluation)
+        {
+            return Math.Abs(evaluation) == 1;
         }
 
         public int GetMoveValue(string move)
@@ -139,18 +167,14 @@ namespace Prince.Games
         {
             var ch = playerJustMoved.ToString()[0];
             var board = _state.Board;
-            if (board.GetRow(0).All(c => c == ch) ||
-                board.GetRow(1).All(c => c == ch) ||
-                board.GetRow(2).All(c => c == ch) ||
-                board.GetCol(0).All(c => c == ch) ||
-                board.GetCol(1).All(c => c == ch) ||
-                board.GetCol(2).All(c => c == ch) ||
-                board[0, 0] == ch && board[1, 1] == ch && board[2, 2] == ch ||
-                board[2, 0] == ch && board[1, 1] == ch && board[0, 2] == ch)
-            {
-                return true;
-            }
-            return false;
+            return board.GetRow(0).All(c => c == ch) ||
+                   board.GetRow(1).All(c => c == ch) ||
+                   board.GetRow(2).All(c => c == ch) ||
+                   board.GetCol(0).All(c => c == ch) ||
+                   board.GetCol(1).All(c => c == ch) ||
+                   board.GetCol(2).All(c => c == ch) ||
+                   board[0, 0] == ch && board[1, 1] == ch && board[2, 2] == ch ||
+                   board[2, 0] == ch && board[1, 1] == ch && board[0, 2] == ch;
         }
 
         public bool Adjudicate()
@@ -178,10 +202,8 @@ namespace Prince.Games
 
 
         /// <summary>
-        /// Evaluation, from the perspective of the player who just moved.
         /// Ranges from -1 to 1.
         /// </summary>
-        /// <returns></returns>
         public float? Evaluate()
         {
             if (CheckIfWinner(Player.X) || CheckIfWinner(Player.O))
@@ -204,7 +226,7 @@ namespace Prince.Games
             {
                 for (int j = 0; j < 3; j++)
                 {
-                    if (_state.Board[i, j] == BLANK)
+                    if (_state.Board[i, j] == Blank)
                     {
                         return false;
                     }

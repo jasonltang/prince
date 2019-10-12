@@ -42,9 +42,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Engine\BruteForce.cs" />
+    <Compile Include="Engine\BruteForceEngine.cs" />
     <Compile Include="Engine\IEngine.cs" />
-    <Compile Include="Engine\Minimax.cs" />
+    <Compile Include="Engine\MinimaxEngine.cs" />
     <Compile Include="ExtensionMethods\MatrixExtensions.cs" />
     <Compile Include="Games\IGame.cs" />
     <Compile Include="Games\TicTacToe.cs" />

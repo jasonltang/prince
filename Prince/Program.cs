@@ -1,7 +1,8 @@
 ﻿// Todo
-// Randomise the winning move.
-// Prioritise immediate wins.
-// Sorting of moves to make minimax more efficient.
+// More unit tests. -- Keep writing.
+// Prioritise quicker wins - done
+// Randomise the winning move - should be a matter of passing in an optional parameter "TrackAllWinningMoves"
+// Sorting of moves to make minimax more efficient. -- Done
 // Allow computer to play both sides.
 
 using System;
@@ -15,13 +16,13 @@ namespace Prince
         static void Main(string[] args)
         {
             var game = new TicTacToe();
-            var engine = new Minimax();
+            var engine = new MinimaxEngine();
             while (true)
             {
                 var input = Console.ReadLine();
                 if (!game.PlayMove(input))
                 {
-                    Console.WriteLine("Invalid move");
+                    Console.WriteLine("Invalid move - input must be of the form 'X01'");
                     continue;
                 }
                 if (game.Adjudicate()) continue;
