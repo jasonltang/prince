@@ -6,7 +6,7 @@ using Prince.ExtensionMethods;
 
 namespace Prince.Games
 {
-    enum Player
+    public enum Player
     {
         X, O
     }
@@ -18,7 +18,7 @@ namespace Prince.Games
         public int Col;
     }
 
-    class TicTacToe : IGame
+    public class TicTacToe : IGame
     {
         private class State
         {
@@ -177,27 +177,21 @@ namespace Prince.Games
                    board[2, 0] == ch && board[1, 1] == ch && board[0, 2] == ch;
         }
 
-        public bool Adjudicate()
+        public int? Adjudicate()
         {
             if (CheckIfWinner(Player.X))
             {
-                Console.WriteLine("X wins!");
-                Reset();
-                return true;
+                return 1;
             }
             if (CheckIfWinner(Player.O))
             {
-                Console.WriteLine("O wins!");
-                Reset();
-                return true;
+                return -1;
             }
             if (BoardFull())
             {
-                Console.WriteLine("It's a draw!");
-                Reset();
-                return true;
+                return 0;
             }
-            return false;
+            return null;
         }
 
 

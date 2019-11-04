@@ -10,7 +10,7 @@ namespace Prince.Engine
     }
 
 
-    interface IEngine
+    public interface IEngine
     {
         Assessment Calculate(IGame game);
     }

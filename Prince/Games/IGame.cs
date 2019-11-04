@@ -29,5 +29,7 @@ namespace Prince.Games
         /// <param name="evaluation"></param>
         /// <returns></returns>
         bool IsTerminalEvaluation(float evaluation);
+
+        int? Adjudicate();
     }
 }

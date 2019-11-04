@@ -15,7 +15,7 @@ namespace Prince
     {
         static void Main(string[] args)
         {
-            var game = new TicTacToe();
+            IGame game = new TicTacToe();
             var engine = new MinimaxEngine();
             while (true)
             {
@@ -25,11 +25,19 @@ namespace Prince
                     Console.WriteLine("Invalid move - input must be of the form 'X01'");
                     continue;
                 }
-                if (game.Adjudicate()) continue;
+
+                if (game.Adjudicate().HasValue)
+                {
+                    game.Reset();
+                    continue;
+                }
                 var computerMove = engine.Calculate(game.Clone()).BestMove;
                 game.PlayMove(computerMove);
                 game.PrintBoard();
-                game.Adjudicate();
+                if (game.Adjudicate().HasValue)
+                {
+                    game.Reset();
+                }
             }
         }
     }
