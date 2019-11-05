@@ -30,6 +30,6 @@ namespace Prince.Games
         /// <returns></returns>
         bool IsTerminalEvaluation(float evaluation);
 
-        int? Adjudicate();
+        int? Adjudicate(Player player);
     }
 }

@@ -1,7 +1,7 @@
 /*
   In App.xaml:
   <Application.Resources>
-      <vm:ViewModelLocator xmlns:vm="clr-namespace:TicTacToe"
+      <vm:ViewModelLocator xmlns:vm="clr-namespace:TicTacToeGame"
                            x:Key="Locator" />
   </Application.Resources>
   
@@ -12,11 +12,26 @@
   See http://www.galasoft.ch/mvvm
 */
 
+using System.Windows;
 using CommonServiceLocator;
 using GalaSoft.MvvmLight.Ioc;
+using GalaSoft.MvvmLight.Messaging;
+using TicTacToe.View;
 
 namespace TicTacToe.ViewModel
 {
+    public enum WindowType
+    {
+        MainWindow,
+        TicTacToeWindow
+    }
+
+    public class GoToWindowMessage
+    {
+        public Window FromWindow { get; set; }
+        public WindowType ToWindow { get; set; }
+    }
+
     /// <summary>
     /// This class contains static references to all the view models in the
     /// application and provides an entry point for the bindings.
@@ -41,17 +56,37 @@ namespace TicTacToe.ViewModel
             ////    SimpleIoc.Default.Register<IDataService, DataService>();
             ////}
 
-            SimpleIoc.Default.Register<MainViewModel>();
+            SimpleIoc.Default.Register<MainWindowViewModel>();
+            SimpleIoc.Default.Register<TicTacToeViewModel>();
+
+            Messenger.Default.Register<GoToWindowMessage>(this, msg =>
+            {
+                Window view;
+                switch (msg.ToWindow)
+                {
+                    case WindowType.TicTacToeWindow:
+                        view = new TicTacToeView()
+                        {
+                            DataContext = SimpleIoc.Default.GetInstance<TicTacToeViewModel>()
+                        };
+                        break;
+                    case WindowType.MainWindow:
+                        view = new MainWindowView()
+                        {
+                            DataContext = SimpleIoc.Default.GetInstance<MainWindowViewModel>()
+                        };
+                        break;
+                    default:
+                        return;
+                }
+                msg.FromWindow.Close();
+                view.ShowDialog();
+            });
         }
 
-        public MainViewModel Main
-        {
-            get
-            {
-                return ServiceLocator.Current.GetInstance<MainViewModel>();
-            }
-        }
-        
+        public MainWindowViewModel MainView => ServiceLocator.Current.GetInstance<MainWindowViewModel>();
+        public TicTacToeViewModel TicTacToe => ServiceLocator.Current.GetInstance<TicTacToeViewModel>();
+
         public static void Cleanup()
         {
             // TODO Clear the ViewModels

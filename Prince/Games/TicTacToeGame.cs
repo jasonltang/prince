@@ -18,7 +18,7 @@ namespace Prince.Games
         public int Col;
     }
 
-    public class TicTacToe : IGame
+    public class TicTacToeGame : IGame
     {
         private class State
         {
@@ -30,7 +30,7 @@ namespace Prince.Games
 
         private const char Blank = '-';
 
-        public TicTacToe()
+        public TicTacToeGame()
         {
             Reset();
         }
@@ -56,7 +56,7 @@ namespace Prince.Games
 
         public IGame Clone() // Cloning may have a problem
         {
-            var newObj = new TicTacToe();
+            var newObj = new TicTacToeGame();
             newObj._state.Board = (char[,])this._state.Board.Clone();
             newObj._state.PlayerToMove = this._state.PlayerToMove;
 
@@ -81,7 +81,7 @@ namespace Prince.Games
         public bool PlayMove(string input)
         {
             if (string.IsNullOrEmpty(input))
-                throw new ArgumentException("Input move is empty!");
+                return false;
             input = input.ToUpper();
             var isValidSyntax =
                 input.Length == 3 &&
@@ -156,6 +156,27 @@ namespace Prince.Games
             }
         }
 
+        /// <summary>
+        /// A hack to prevent engine thinking excessively on first move
+        /// </summary>
+        public string GetFirstMove()
+        {
+            var random = Util.Random.Next() % 10;
+            switch (random)
+            {
+                case 0:
+                    return "X00";
+                case 1:
+                    return "X02";
+                case 2:
+                    return "X20";
+                case 3:
+                    return "X22";
+                default:
+                    return "X11";
+            }
+        }
+
         public void PrintBoard()
         {
             Console.WriteLine(_state.Board.GetRow(0));
@@ -163,29 +184,49 @@ namespace Prince.Games
             Console.WriteLine(_state.Board.GetRow(2));
         }
 
-        public bool CheckIfWinner(Player playerJustMoved)
+        public Player? CheckWinner()
         {
-            var ch = playerJustMoved.ToString()[0];
             var board = _state.Board;
-            return board.GetRow(0).All(c => c == ch) ||
-                   board.GetRow(1).All(c => c == ch) ||
-                   board.GetRow(2).All(c => c == ch) ||
-                   board.GetCol(0).All(c => c == ch) ||
-                   board.GetCol(1).All(c => c == ch) ||
-                   board.GetCol(2).All(c => c == ch) ||
-                   board[0, 0] == ch && board[1, 1] == ch && board[2, 2] == ch ||
-                   board[2, 0] == ch && board[1, 1] == ch && board[0, 2] == ch;
+            foreach (var player in Enum.GetValues(typeof(Player)).Cast<Player>())
+            {
+                var ch = player.ToString()[0];
+                if (board.GetRow(0).All(c => c == ch) ||
+                    board.GetRow(1).All(c => c == ch) ||
+                    board.GetRow(2).All(c => c == ch) ||
+                    board.GetCol(0).All(c => c == ch) ||
+                    board.GetCol(1).All(c => c == ch) ||
+                    board.GetCol(2).All(c => c == ch) ||
+                    board[0, 0] == ch && board[1, 1] == ch && board[2, 2] == ch ||
+                    board[2, 0] == ch && board[1, 1] == ch && board[0, 2] == ch)
+                    return player;
+            }
+            return null;
         }
 
-        public int? Adjudicate()
+        public string Result(int result)
         {
-            if (CheckIfWinner(Player.X))
+            switch (result)
             {
-                return 1;
+                case 1:
+                    return "You won!";
+                case -1:
+                    return "You lost!";
+                case 0:
+                    return "It's a draw!";
+                default:
+                    return string.Empty;
+
             }
-            if (CheckIfWinner(Player.O))
+        }
+
+        public int? Adjudicate(Player player)
+        {
+            var winner = CheckWinner();
+            if (winner.HasValue)
             {
-                return -1;
+                return winner.Value == player
+                    ? 1
+                    : -1;
             }
             if (BoardFull())
             {
@@ -200,7 +241,7 @@ namespace Prince.Games
         /// </summary>
         public float? Evaluate()
         {
-            if (CheckIfWinner(Player.X) || CheckIfWinner(Player.O))
+            if (CheckWinner().HasValue)
             {
                 return -1;
             }

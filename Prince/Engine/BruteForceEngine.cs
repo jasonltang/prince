@@ -1,4 +1,5 @@
-﻿using Prince.Games;
+﻿using System.Collections.Generic;
+using Prince.Games;
 
 namespace Prince.Engine
 {
@@ -23,7 +24,7 @@ namespace Prince.Engine
                 if (-assessment.Evaluation > finalResult.Evaluation)
                 {
                     finalResult.Evaluation = -assessment.Evaluation;
-                    finalResult.BestMove = move;
+                    finalResult.BestMoves = new HashSet<string> {move};
                 }
             }
             return finalResult;

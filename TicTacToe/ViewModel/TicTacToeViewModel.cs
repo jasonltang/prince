@@ -1,31 +1,18 @@
-// TODO Allow play as O
-// TODO GO back and fix engine to randomise moves if multiple are equal
-
+using System.Windows;
 using System.Windows.Input;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
+using GalaSoft.MvvmLight.Messaging;
 using Prince.Engine;
 using Prince.Games;
 
 namespace TicTacToe.ViewModel
 {
-    /// <summary>
-    /// This class contains properties that the main View can data bind to.
-    /// <para>
-    /// Use the <strong>mvvminpc</strong> snippet to add bindable properties to this ViewModel.
-    /// </para>
-    /// <para>
-    /// You can also use Blend to data bind with the tool's support.
-    /// </para>
-    /// <para>
-    /// See http://www.galasoft.ch/mvvm
-    /// </para>
-    /// </summary>
-    public class MainViewModel : ViewModelBase
+    public class TicTacToeViewModel : ViewModelBase
     {
         #region Constants
-        public const string X = "C:\\Jason\\Board Games 3.jpeg";
-        public const string O = "C:\\Jason\\68682899_2884475871569003_5686428909109772288_o.jpg";
+        public const string X = "..\\Images\\corgi.png";
+        public const string O = "..\\Images\\penguin.png";
         #endregion
 
         #region Backing Properties
@@ -142,31 +129,39 @@ namespace TicTacToe.ViewModel
 
         public ICommand PlayMoveCommand => new RelayCommand<string>(PlayMove);
         public ICommand ResetCommand => new RelayCommand(Reset);
+        public ICommand ResetPlaySecondCommand => new RelayCommand(ResetPlaySecond);
+        public ICommand GoToHomeScreenCommand => new RelayCommand<Window>(window =>
+        {
+            var msg = new GoToWindowMessage {FromWindow = window, ToWindow = WindowType.MainWindow};
+            Messenger.Default.Send(msg);
+        });
 
         private bool _canClick = true;
+        private Player _playerSide = Player.X;
 
-        IGame game = new Prince.Games.TicTacToe();
-        IEngine engine = new MinimaxEngine();
+        TicTacToeGame game = new TicTacToeGame();
+        IEngine engine = new MinimaxEngine(true);
 
         public void PlayMove(string param)
         {
             if (!_canClick)
                 return;
-            game.PlayMove("X" + param[0] + param[1]);
-            UpdateScreen("X" + param);
+            if (!game.PlayMove(_playerSide.ToString() + param[0] + param[1]))
+                return;
+            UpdateScreen(_playerSide + param);
             int? res;
-            if ((res = game.Adjudicate()).HasValue)
+            if ((res = game.Adjudicate(_playerSide)).HasValue)
             {
-                TextBoxText = Result(res.Value);
+                TextBoxText = game.Result(res.Value);
                 _canClick = false;
                 return;
             }
-            var computerMove = engine.Calculate(game.Clone()).BestMove;
+            var computerMove = engine.Calculate(game.Clone()).GetMove();
             game.PlayMove(computerMove);
             UpdateScreen(computerMove);
-            if ((res = game.Adjudicate()).HasValue)
+            if ((res = game.Adjudicate(_playerSide)).HasValue)
             {
-                TextBoxText = Result(res.Value);
+                TextBoxText = game.Result(res.Value);
                 _canClick = false;
             }
         }
@@ -178,26 +173,12 @@ namespace TicTacToe.ViewModel
             GetType().GetProperty(variableName).SetValue(this, imageLocation);
         }
 
-        private string Result(int result)
-        {
-            switch (result)
-            {
-                case 1:
-                    return "You won!";
-                case -1:
-                    return "You lost!";
-                case 0:
-                    return "It's a draw!";
-                default:
-                    return string.Empty;
-
-            }
-        }
-
         public void Reset()
         {
             game.Reset();
             _canClick = true;
+            TextBoxText = default;
+            _playerSide = Player.X;
             for (int i = 0; i < 3; i++)
             {
                 for (int j = 0; j < 3; j++)
@@ -208,19 +189,17 @@ namespace TicTacToe.ViewModel
             }
         }
 
-        /// <summary>
-        /// Initializes a new instance of the MainViewModel class.
-        /// </summary>
-        public MainViewModel()
+        public void ResetPlaySecond()
         {
-            ////if (IsInDesignMode)
-            ////{
-            ////    // Code runs in Blend --> create design time data.
-            ////}
-            ////else
-            ////{
-            ////    // Code runs "for real"
-            ////}
+            Reset();
+            _playerSide = Player.O;
+            var computerMove = game.GetFirstMove();
+            game.PlayMove(computerMove);
+            UpdateScreen(computerMove);
+        }
+
+        public TicTacToeViewModel()
+        {
         }
     }
 }

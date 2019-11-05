@@ -15,8 +15,8 @@ namespace Prince
     {
         static void Main(string[] args)
         {
-            IGame game = new TicTacToe();
-            var engine = new MinimaxEngine();
+            IGame game = new TicTacToeGame();
+            var engine = new MinimaxEngine(true);
             while (true)
             {
                 var input = Console.ReadLine();
@@ -26,15 +26,17 @@ namespace Prince
                     continue;
                 }
 
-                if (game.Adjudicate().HasValue)
+                int? res;
+                if ((res = game.Adjudicate(Player.X)).HasValue)
                 {
+                    Console.WriteLine(((TicTacToeGame)game).Result(res.Value));
                     game.Reset();
                     continue;
                 }
-                var computerMove = engine.Calculate(game.Clone()).BestMove;
+                var computerMove = engine.Calculate(game.Clone()).GetMove();
                 game.PlayMove(computerMove);
                 game.PrintBoard();
-                if (game.Adjudicate().HasValue)
+                if (game.Adjudicate(Player.X).HasValue)
                 {
                     game.Reset();
                 }

@@ -1,4 +1,6 @@
-﻿using Prince.Games;
+﻿using System;
+using System.Collections.Generic;
+using Prince.Games;
 using System.Linq;
 
 namespace Prince.Engine
@@ -6,6 +8,13 @@ namespace Prince.Engine
     public class MinimaxEngine : IEngine
     {
         private const int MaxEval = 999;
+
+        private bool _randomiseMoves;
+
+        public MinimaxEngine(bool randomiseMoves = false)
+        {
+            _randomiseMoves = randomiseMoves;
+        }
 
         public Assessment Calculate(IGame game)
         {
@@ -45,11 +54,16 @@ namespace Prince.Engine
                 }
 
                 // If you found a move which is stronger than what you have so far, overwrite your best move
-                if (IsStrongerThan(assessment, interimResult))
+                switch (IsStrongerThan(assessment, interimResult))
                 {
-                    interimResult.Evaluation = -assessment.Evaluation;
-                    interimResult.BestMove = move;
-                    interimResult.MovesToFinishGame = assessment.MovesToFinishGame;
+                    case true:
+                        interimResult.Evaluation = -assessment.Evaluation;
+                        interimResult.BestMoves = new HashSet<string> {move};
+                        interimResult.MovesToFinishGame = assessment.MovesToFinishGame;
+                        break;
+                    case null when _randomiseMoves:
+                        interimResult.BestMoves.Add(move);
+                        break;
                 }
 
                 // If your best evaluation is better than baseline,
@@ -62,10 +76,15 @@ namespace Prince.Engine
             return interimResult;
         }
 
-        private bool IsStrongerThan(Assessment move1, Assessment move2)
+        /// <summary>
+        /// Returns null if two moves are equally good.
+        /// </summary>
+        private bool? IsStrongerThan(Assessment move1, Assessment move2)
         {
             if (-move1.Evaluation > move2.Evaluation) return true;
             if (-move1.Evaluation < move2.Evaluation) return false;
+            if (Math.Abs(-move1.Evaluation) < 0.00001 || move1.MovesToFinishGame == move2.MovesToFinishGame)
+                return null;
             if (-move1.Evaluation > 0) // Winning - best move is quickest win
                 return move1.MovesToFinishGame < move2.MovesToFinishGame;
             if (-move1.Evaluation < 0) // Losing - best move is slowest loss

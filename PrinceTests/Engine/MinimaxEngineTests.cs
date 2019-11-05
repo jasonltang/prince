@@ -10,8 +10,8 @@ namespace PrinceTests.Engine
         [Test]
         public void Calculate_InitialStartingPosition_ReturnsZero()
         {
-            var engine = new MinimaxEngine();
-            var game = new TicTacToe();
+            var engine = new MinimaxEngine(true);
+            var game = new TicTacToeGame();
             var result = engine.Calculate(game);
             Assert.That(result.Evaluation, Is.EqualTo(0));
         }
@@ -19,12 +19,12 @@ namespace PrinceTests.Engine
         [Test]
         public void Calculate_DeadLostPosition_ReturnsNegativeOne()
         {
-            var engine = new MinimaxEngine();
-            var game = new TicTacToe();
+            var engine = new MinimaxEngine(true);
+            var game = new TicTacToeGame();
             game.SetState("OOX OXX XXO O");
             var result = engine.Calculate(game);
             Assert.That(result.Evaluation, Is.EqualTo(-1));
-            Assert.That(result.BestMove, Is.Null);
+            Assert.That(result.GetMove(), Is.Null);
         }
 
         [TestCase("--- --- --- X", 0, "X00 X01 X02 X10 X11 X12 X20 X21 X22", null)]
@@ -37,12 +37,12 @@ namespace PrinceTests.Engine
         [TestCase("O-- -X- --X O", 0, "O02 O20", null)]
         public void Calculate_OtherVariousCases_ReturnsCorrectEvaluationAndMove(string boardState, int expectedEvaluation, string expectedBestMove, int? expectedMovesToFinishGame)
         {
-            var engine = new MinimaxEngine();
-            var game = new TicTacToe();
+            var engine = new MinimaxEngine(true);
+            var game = new TicTacToeGame();
             game.SetState(boardState);
             var result = engine.Calculate(game);
             Assert.That(result.Evaluation, Is.EqualTo(expectedEvaluation));
-            Assert.Contains(result.BestMove, expectedBestMove.Split(' '));
+            Assert.Contains(result.GetMove(), expectedBestMove.Split(' '));
             Assert.That(result.MovesToFinishGame, Is.EqualTo(expectedMovesToFinishGame));
         }
     }
