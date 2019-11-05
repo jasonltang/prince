@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Prince", "Prince\Prince.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrinceTests", "PrinceTests\PrinceTests.csproj", "{B1E08501-D652-4F89-B607-3B1C10052B24}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicTacToe", "TicTacToe\TicTacToe.csproj", "{C7D03F32-54FB-4983-9551-13220D0E5877}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GUI", "GUI\GUI.csproj", "{C7D03F32-54FB-4983-9551-13220D0E5877}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

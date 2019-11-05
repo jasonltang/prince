@@ -4,8 +4,6 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using GalaSoft.MvvmLight.Messaging;
 
-// TODO: Fix switching between windows
-
 namespace TicTacToe.ViewModel
 {
     public class MainWindowViewModel : ViewModelBase
