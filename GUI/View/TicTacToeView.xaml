@@ -6,7 +6,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GUI"
         mc:Ignorable="d"
-        Title="TicTacToeWindow" Height="450" Width="800">
+        Title="Tic Tac Toe" Height="450" Width="800">
     <Grid>
         <Grid HorizontalAlignment="Left" Height="300" Margin="247,56,0,0" VerticalAlignment="Top" Width="300">
             <Grid.ColumnDefinitions>
